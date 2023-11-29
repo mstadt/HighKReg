@@ -1,6 +1,6 @@
 set_params <- function(){
     list(
-        Phi_Kin_ss = 0.048611111111111,
+        Phi_Kin_ss = 0.04861111,
         t_insulin_ss = 270,
         fecal_excretion = 0.1,
         kgut = 0.01,
@@ -31,7 +31,9 @@ set_params <- function(){
         FF = 0.250274,
         A_insulin = 0.999789,
         B_insulin = 0.6645,
-        rho_al = 0.7410301,
-        beta_al = 0.003046705
+        alpha_al = 0.7410301,
+        beta_al = 0.003046705,
+        k = 1.069,
+        x0 = 0.5381
     )
 }

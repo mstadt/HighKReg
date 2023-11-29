@@ -6,12 +6,23 @@ model <- function(Time, State, Pars, opts){
 
     meal_start <- opts$meal_start
     Kintake <- opts$Kintake
+    SS <- opts$SS
 
     with(as.list(c(State, Pars)), {
         # set parameters that are fixed (not in Morris Analysis)
+        # TODO
 
+        if (SS) {
+            Kintake <- Phi_Kin_ss # set Kintake to ss if at SS
+        }
+    
         # Get insulin levels
-        t_insulin = Time - meal_start # this is going to have to be like this I think...
+        if (SS) {
+            t_insulin = -10
+        } else {
+            t_insulin = Time - meal_start 
+        }
+        
         # C_insulin units are in nanomole/L
         do_insulin = 1
         if (do_insulin) {
@@ -28,8 +39,8 @@ model <- function(Time, State, Pars, opts){
                 print("something went wrong with t_insulin")
             }
             L = 100
-            x0 = 0.5381
-            k = 1.069
+            # x0 = 0.5381 # NOTE: added to parameters so can use in MA
+            # k = 1.069 # NOTE: added to parameters so can use in MA
             ins_A = A_insulin
             ins_B = 100 * B_insulin
             temp = (ins_A*(L/(1+exp(-k*(log10(C_insulin)
@@ -47,8 +58,6 @@ model <- function(Time, State, Pars, opts){
         N_al = exp(m_K_ALDO * (K_ECFtot - Kecf_total))
         C_al = N_al * ALD_eq
 
-
-
         # Gut K (M_Kgut)
         Phi_Kin = Kintake
         Intake2gut = (1 - fecal_excretion) * Phi_Kin
@@ -62,7 +71,7 @@ model <- function(Time, State, Pars, opts){
         # ALD impact
         gamma_al = A_dtKsec * C_al^B_dtKsec
         lambda_al = A_cdKsec * C_al^B_cdKsec
-        #rho_al = (66.4 + 0.273*C_al)./89.6050 # IDEA: change to alpha_al, beta_al
+        #rho_al = (66.4 + 0.273*C_al)/89.6050 # IDEA: change to alpha_al, beta_al
         rho_al = alpha_al + beta_al * C_al # alpha_al = 66.4/89.605
 
         # GI FF effect
@@ -73,8 +82,16 @@ model <- function(Time, State, Pars, opts){
         # baseline proximal segment reabsorption
         eta_psKreab_base = eta_ptKreab_base + eta_LoHKreab
 
-        # PT high K intake effect
-        eta_psKreab = eta_ptKreab_highK + eta_LoHKreab
+        
+        if (SS) {
+            # no high K effect at SS
+            eta_psKreab = eta_ptKreab_base + eta_LoHKreab
+            alpha_TGF = 0
+        } else {
+            # PT high K intake effect
+            eta_psKreab = eta_ptKreab_highK + eta_LoHKreab
+        }
+        
         # TGF effect
         GFR <- GFR_base + alpha_TGF * (eta_psKreab - eta_psKreab_base)
 
@@ -92,7 +109,7 @@ model <- function(Time, State, Pars, opts){
         eta_cdKsec = lambda_al
         cdKsec = cdKsec_eq * eta_cdKsec
 
-        dtK = filK - dsKreab + dtKsec # flow from distal tubule
+        dtK = filK - psKreab + dtKsec # flow from distal tubule
         cdKreab = dtK * A_cdKreab
 
         # Urine
@@ -110,7 +127,7 @@ model <- function(Time, State, Pars, opts){
         
         # Intracellular K (M_Kmuscle)
         dmuscle <- Inter2Muscle - Muscle2Inter
-        
+
         # return the derviatives
         return(list(c(dgut, dplas, dinter, dmuscle)))        
     }) # end of with
