@@ -14,14 +14,14 @@ source("model.r") # model equations
 
 # Set model parameters
 params <- set_params() 
-notes = "control" #"highK_tgfoff" #"highK_ptoff" #"highK_pttgf"
+notes = "highK_ptonly" #"highK_tgfoff" #"highK_ptoff" #"highK_pttgf"
 
 Kamt_control <- 78/3
-Kamt <- Kamt_control #4 * Kamt_control # amount of K per meal, high K
+Kamt <- Kamt_control * 4 #4 * Kamt_control # amount of K per meal, high K
 
 # NOTE: need to commment this for high K simulations
+# PT effect OFF
 params$eta_ptKreab_highK <- params$eta_ptKreab_base
-# params$alpha_TGF <- 0 
 
 # variable names
 get_varnames <- function() {
@@ -93,6 +93,7 @@ meal_sim <- function(IC, t0, len_meal, Kamt, params){
     return(out)
 } # end of meal_sim
 
+
 day_sim <- function(IC0, len_meal, MealTimes, Kamt, params) {
     tvals <- seq(0,MealTimes[1],1)
     last_meal <- -6*60
@@ -146,7 +147,9 @@ day_sim <- function(IC0, len_meal, MealTimes, Kamt, params) {
 
     out_all <-rbind(out_all,out_fast3)
 return(out_all)
-}
+} # end of day sim
+
+
 
 # One day of meals
 MealTimes <- array(c(6,12,18)) * 60.0
@@ -168,6 +171,8 @@ print(sprintf("K_muscle = %0.3f", K_muscle_end))
 
 
 # 50 days of simulation
+endday_val = array(rep(0,2*50), dim=c(2,50)) # row1: Kplas, row2:Kmuscle # end of each day
+
 day1_sim <- day_sim(IC0, 30, MealTimes, Kamt, params)
 today <- Sys.Date()
 fname = paste("Sim50Days/",
@@ -182,7 +187,12 @@ fname = paste("Sim50Days/",
                 sep = "")
 write.csv(day1_sim, file = fname)
 
-end <- day1_sim[nrow(day1_sim), ] # get last row of day1_sim
+end <- tail(day1_sim, n=1) # get last row of day1_sim
+endKplas <- end$M_Kplas / params$V_plasma
+endKmusc <- end$M_Kmuscle / params$V_muscle
+ii = 1
+endday_val[1,ii] = endKplas
+endday_val[2,ii] = endKmusc
 IC <- unlist(end[varnames])
 for(ii in 2:50) {
     if (ii %% 10 == 0) {
@@ -200,9 +210,15 @@ for(ii in 2:50) {
                 ".csv",
                 sep = "")
     write.csv(day_ii_sim, file = fname)
-    end <- day_ii_sim[nrow(day_ii_sim), ]
+    end <- tail(day_ii_sim, n=1)
+    endKplas <- end$M_Kplas / params$V_plasma
+    endKmusc <- end$M_Kmuscle / params$V_muscle
+    endday_val[1,ii] = endKplas
+    endday_val[2,ii] = endKmusc
     IC <- unlist(end[varnames]) # change IC for next day
 }
+
+
 
 
 # TODO:
