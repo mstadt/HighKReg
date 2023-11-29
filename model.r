@@ -62,6 +62,8 @@ model <- function(Time, State, Pars, opts){
         # ALD impact
         gamma_al = A_dtKsec * C_al^B_dtKsec
         lambda_al = A_cdKsec * C_al^B_cdKsec
+        #rho_al = (66.4 + 0.273*C_al)./89.6050 # IDEA: change to alpha_al, beta_al
+        rho_al = alpha_al + beta_al * C_al # alpha_al = 66.4/89.605
 
         # GI FF effect
         gamma_Kin = max(1, FF*(M_Kgut - MKgutSS))
@@ -99,38 +101,17 @@ model <- function(Time, State, Pars, opts){
         dplas <- Gut2plasma - Plas2ECF - UrineK
 
         # Interstitial K (M_Kinter)
-        # TO DO!
+        eta_NKA = rho_insulin * rho_al
 
+        Inter2Muscle = eta_NKA * ((Vmax * K_inter)/(Km + K_inter))
+        Muscle2Inter = P_muscle * (K_muscle - K_inter)
 
-
-
-# dydt(2) = Gut2plasma - Plas2ECF - UrineK;
-
-# %% Interstitial K (M_Kinter)
-# rho_al = (66.4 + 0.273*C_al)./89.6050;
-# % insulin
-# L = 100; x0 = 0.5381; k = 1.069;
-# ins_A = A_insulin; ins_B = 100*B_insulin;
-# temp = (ins_A.*(L./(1+exp(-k.*(log10(C_insulin)-log10(x0)))))+ ins_B)./100;
-# if do_insulin
-#     rho_insulin = max(1.0,temp);
-#     %disp(C_insulin)
-#     %disp(temp)
-#     %disp(rho_insulin)
-# else
-#     rho_insulin = 1;
-# end
-# eta_NKA = rho_insulin * rho_al;
-
-# Inter2Muscle = eta_NKA* ((Vmax * K_inter)/(Km + K_inter));
-# Muscle2Inter = P_muscle*(K_muscle - K_inter);
-
-# dydt(3) = Plas2ECF - Inter2Muscle + Muscle2Inter;
-
-# %% Intracellular K (M_Kmuscle)
-# dydt(4) = Inter2Muscle - Muscle2Inter;
-
-    # return the derviatives
+        dinter <- Plas2ECF - Inter2Muscle + Muscle2Inter
+        
+        # Intracellular K (M_Kmuscle)
+        dmuscle <- Inter2Muscle - Muscle2Inter
+        
+        # return the derviatives
         return(list(c(dgut, dplas, dinter, dmuscle)))        
     }) # end of with
 

@@ -31,6 +31,7 @@ set_params <- function(){
         FF = 0.250274,
         A_insulin = 0.999789,
         B_insulin = 0.6645,
-        meal_start = 0
+        rho_al = 0.7410301,
+        beta_al = 0.003046705
     )
 }
