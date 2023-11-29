@@ -1,5 +1,8 @@
 # This script can be used to simulate a single 50 day simulation
-# of high K intake.
+# of high K intake. The output is files that are every day of the simulation
+# with time points at every minute in the simulation.
+# This can be used to verify that the model version I have written in R is 
+# written correctly.
 
 # load libraries
 library(deSolve)
@@ -11,10 +14,14 @@ source("model.r") # model equations
 
 # Set model parameters
 params <- set_params() 
-# CONTROL K
-Kamt <- 78/3 #4 * 78 / 3
+notes = "control" #"highK_tgfoff" #"highK_ptoff" #"highK_pttgf"
+
+Kamt_control <- 78/3
+Kamt <- Kamt_control #4 * Kamt_control # amount of K per meal, high K
+
 # NOTE: need to commment this for high K simulations
 params$eta_ptKreab_highK <- params$eta_ptKreab_base
+# params$alpha_TGF <- 0 
 
 # variable names
 get_varnames <- function() {
@@ -160,24 +167,43 @@ print(sprintf("K_inter = %0.3f", K_inter_end))
 print(sprintf("K_muscle = %0.3f", K_muscle_end))
 
 
-# TODO: 50 days of simulation
-# Note: the only thing that changes is the initial condition
+# 50 days of simulation
 day1_sim <- day_sim(IC0, 30, MealTimes, Kamt, params)
+today <- Sys.Date()
+fname = paste("Sim50Days/",
+                today, 
+                "_50daysim",
+                "_day-", "1",
+                "_Kamt-", Kamt,
+                "_etaPTKreab-", params$eta_ptKreab_highK,
+                "_alphaTGF-", params$alpha_TGF,
+                "_notes-", notes,
+                ".csv",
+                sep = "")
+write.csv(day1_sim, file = fname)
 
 end <- day1_sim[nrow(day1_sim), ] # get last row of day1_sim
 IC <- unlist(end[varnames])
 for(ii in 2:50) {
-    if (ii %% 5 == 0) {
+    if (ii %% 10 == 0) {
         print(sprintf('Day: %i', ii))
     }
     day_ii_sim <- day_sim(IC, 30, MealTimes, Kamt, params)
-    # TODO: save simulation...csv per day?
-    #     is there a better way to save?
+    fname = paste("Sim50Days/",
+                today, 
+                "_50daysim",
+                "_day-", ii,
+                "_Kamt-", Kamt,
+                "_etaPTKreab-", params$eta_ptKreab_highK,
+                "_alphaTGF-", params$alpha_TGF,
+                "_notes-", notes,
+                ".csv",
+                sep = "")
+    write.csv(day_ii_sim, file = fname)
     end <- day_ii_sim[nrow(day_ii_sim), ]
     IC <- unlist(end[varnames]) # change IC for next day
 }
 
-# TODO: save the daily output and check if this is good...
 
 # TODO:
 # - meal times need to match what is in the MATLAB code
