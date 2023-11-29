@@ -14,14 +14,19 @@ source("model.r") # model equations
 
 # Set model parameters
 params <- set_params() 
-notes = "highK_ptonly" #"highK_tgfoff" #"highK_ptoff" #"highK_pttgf"
+notes = "highK_pttgf"
+
+# save simulation?
+save_sim = 0
+
+#notes = "highK_ptonly" #"highK_tgfoff" #"highK_ptoff" #"highK_pttgf"
 
 Kamt_control <- 78/3
 Kamt <- Kamt_control * 4 #4 * Kamt_control # amount of K per meal, high K
 
 # NOTE: need to commment this for high K simulations
 # PT effect OFF
-params$eta_ptKreab_highK <- params$eta_ptKreab_base
+# params$eta_ptKreab_highK <- params$eta_ptKreab_base
 
 # variable names
 get_varnames <- function() {
@@ -174,18 +179,21 @@ print(sprintf("K_muscle = %0.3f", K_muscle_end))
 endday_val = array(rep(0,2*50), dim=c(2,50)) # row1: Kplas, row2:Kmuscle # end of each day
 
 day1_sim <- day_sim(IC0, 30, MealTimes, Kamt, params)
-today <- Sys.Date()
-fname = paste("Sim50Days/",
-                today, 
-                "_50daysim",
-                "_day-", "1",
-                "_Kamt-", Kamt,
-                "_etaPTKreab-", params$eta_ptKreab_highK,
-                "_alphaTGF-", params$alpha_TGF,
-                "_notes-", notes,
-                ".csv",
-                sep = "")
-write.csv(day1_sim, file = fname)
+
+if (save_sim){
+    today <- Sys.Date()
+    fname = paste("Sim50Days/",
+                    today, 
+                    "_50daysim",
+                    "_day-", "1",
+                    "_Kamt-", Kamt,
+                    "_etaPTKreab-", params$eta_ptKreab_highK,
+                    "_alphaTGF-", params$alpha_TGF,
+                    "_notes-", notes,
+                    ".csv",
+                    sep = "")
+    write.csv(day1_sim, file = fname)
+}
 
 end <- tail(day1_sim, n=1) # get last row of day1_sim
 endKplas <- end$M_Kplas / params$V_plasma
@@ -199,17 +207,19 @@ for(ii in 2:50) {
         print(sprintf('Day: %i', ii))
     }
     day_ii_sim <- day_sim(IC, 30, MealTimes, Kamt, params)
-    fname = paste("Sim50Days/",
-                today, 
-                "_50daysim",
-                "_day-", ii,
-                "_Kamt-", Kamt,
-                "_etaPTKreab-", params$eta_ptKreab_highK,
-                "_alphaTGF-", params$alpha_TGF,
-                "_notes-", notes,
-                ".csv",
-                sep = "")
-    write.csv(day_ii_sim, file = fname)
+    if (save_sim) {
+        fname = paste("Sim50Days/",
+                    today, 
+                    "_50daysim",
+                    "_day-", ii,
+                    "_Kamt-", Kamt,
+                    "_etaPTKreab-", params$eta_ptKreab_highK,
+                    "_alphaTGF-", params$alpha_TGF,
+                    "_notes-", notes,
+                    ".csv",
+                    sep = "")
+        write.csv(day_ii_sim, file = fname)
+    }
     end <- tail(day_ii_sim, n=1)
     endKplas <- end$M_Kplas / params$V_plasma
     endKmusc <- end$M_Kmuscle / params$V_muscle
