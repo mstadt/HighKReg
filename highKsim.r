@@ -89,7 +89,7 @@ meal_sim <- function(IC, t0, len_meal, Kamt, params){
 day_sim <- function(IC0, len_meal, MealTimes, Kamt, params) {
     tvals <- seq(0,MealTimes[1],1)
     last_meal <- -6*60
-    out_fast0 <- fast_sim(IC, tvals, last_meal, params)
+    out_fast0 <- fast_sim(IC0, tvals, last_meal, params)
 
     # Meal 1
     end <- out_fast0[nrow(out_fast0),] # get last row of out fast
@@ -148,19 +148,39 @@ IC0 <- unlist(ST$y[varnames])
 
 sim_1day <- day_sim(IC0, 30, MealTimes, Kamt, params)
 
-end_conc = 
+end_vals = sim_1day[nrow(sim_1day), ]
 
+K_plas_end <- end_vals['M_Kplas'] / params$V_plasma
+K_inter_end <- end_vals['M_Kinter'] / params$V_interstitial
+K_muscle_end <- end_vals['M_Kmuscle'] / params$V_muscle
+
+print('End of 1 day simulation')
+print(sprintf("K_plas = %0.3f", K_plas_end))
+print(sprintf("K_inter = %0.3f", K_inter_end))
+print(sprintf("K_muscle = %0.3f", K_muscle_end))
+
+
+# TODO: 50 days of simulation
+# Note: the only thing that changes is the initial condition
+day1_sim <- day_sim(IC0, 30, MealTimes, Kamt, params)
+
+end <- day1_sim[nrow(day1_sim), ] # get last row of day1_sim
+IC <- unlist(end[varnames])
+for(ii in 2:50) {
+    if (ii %% 5 == 0) {
+        print(sprintf('Day: %i', ii))
+    }
+    day_ii_sim <- day_sim(IC, 30, MealTimes, Kamt, params)
+    # TODO: save simulation...csv per day?
+    #     is there a better way to save?
+    end <- day_ii_sim[nrow(day_ii_sim), ]
+    IC <- unlist(end[varnames]) # change IC for next day
+}
+
+# TODO: save the daily output and check if this is good...
 
 # TODO:
 # - meal times need to match what is in the MATLAB code
 # To optimize Morris Analysis do not save the rbind out code
 # because this will slow things down.... I only need the concentrations at the 
 # very end of the simulation
-
-
-
-# TODO:
-#   - Do the K intake as "events" in the R model as done in the calcium
-#      simulations for teripartide
-#      NOTE: this is note
-#   
