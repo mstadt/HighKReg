@@ -84,20 +84,14 @@ day_sim <- function(IC0, len_meal, MealTimes, Kamt, params) {
 return(out_fast3)
 } # end of day sim
 
-end_50daysim <- function(IC0, len_meal, MealTimes, Kmt, params) {
+end_50daysim <- function(IC0, len_meal, MealTimes, Kamt, params) {
     IC <- IC0 # first IC for day 1
     # endday_val = array(rep(0,2*50), dim=c(2,50))
     for(ii in 1:50){
-        if (ii%%10 == 0){
-            print(sprintf("Day: %i", ii))
-        }
+        # if (ii%%10 == 0){
+        #     print(sprintf("Day: %i", ii))
+        # }
         day_ii_end <- day_sim(IC, len_meal, MealTimes, Kamt, params)
-        # end <- day_ii_end
-        # endKplas <- end$M_Kplas / params$V_plasma
-        # endKmusc <- end$M_Kmuscle / params$V_muscle
-        # endday_val[1,ii] = endKplas
-        # endday_val[2,ii] = endKmusc
-
         IC <- unlist(end[varnames])
     }
 
@@ -107,4 +101,20 @@ end_50daysim <- function(IC0, len_meal, MealTimes, Kmt, params) {
     end_Kmusc <- end$M_Kmuscle / params$V_muscle
 
     return(c(end_Kplas, end_Kmusc))
+}
+
+main_sim <- function(params){
+    # simulation settings
+    Kamt_control <- 78/3
+    Kamt <- 4 * Kamt_control  # high K diet
+    MealTimes <- array(c(6,12,18)) * 60.0 
+    len_meal <- 30
+    IC0 <- c(M_Kgut = 4.375,
+                M_Kplas = 18.92818,
+                M_Kinter = 42.06262,
+                M_Kmuscle = 3103.76386)
+
+    vals <- end_50daysim(IC0, 30, MealTimes, Kamt, params)
+
+    return(vals)
 }

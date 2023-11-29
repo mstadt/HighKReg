@@ -35,6 +35,10 @@ IC <- c(M_Kgut = 4.375,
 
 IC0 <- IC
 
-print('start 50 day sim')
-test_vals <- end_50daysim(IC0, 30, MealTimes, Kamt, params)
-print('done')
+#print('start 50 day sim')
+#test_vals <- end_50daysim(IC0, 30, MealTimes, Kamt, params)
+#print('done')
+
+test_vals <- main_sim(params)
+
+print(test_vals)
