@@ -10,7 +10,14 @@ model_Kreg <- function(Time, State, Pars, opts){
 
     with(as.list(c(State, Pars)), {
         # set parameters that are fixed (not in Morris Analysis)
-        # TODO
+        Phi_Kin_ss = 0.04861111
+        t_insulin_ss = 270
+        fecal_excretion = 0.1
+        MKgutSS <- (0.9 * Phi_Kin_ss) / kgut
+        Kecf_total = 4.2
+        Kmuscle_baseline = 130
+        NKAbase <- (Vmax * Kecf_total)/(Km + Kecf_total)
+        P_muscle <- NKAbase / (Kmuscle_baseline - Kecf_total)
 
         if (SS) {
             Kintake <- Phi_Kin_ss # set Kintake to ss if at SS
@@ -109,11 +116,11 @@ model_Kreg <- function(Time, State, Pars, opts){
         eta_cdKsec = lambda_al
         cdKsec = cdKsec_eq * eta_cdKsec
 
-        dtK = filK - psKreab + dtKsec # flow from distal tubule
+        dtK = max(0.0, filK - psKreab + dtKsec) # flow from distal tubule
         cdKreab = dtK * A_cdKreab
 
         # Urine
-        UrineK <- dtK + cdKsec - cdKreab
+        UrineK <- max(dtK + cdKsec - cdKreab, 0.01*filK)
 
         dplas <- Gut2plasma - Plas2ECF - UrineK
 

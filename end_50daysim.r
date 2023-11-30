@@ -118,12 +118,12 @@ main_sim <- function(params){
     return(vals)
 }
 
-Kplas_50days(pars) {
+Kplas_50days <- function(pars) {
     vals <- main_sim(pars)
     return(vals[1]) # Kplas
 }
 
-Kmusc_50days(pars) {
+Kmusc_50days <- function(pars) {
     vals <- main_sim(pars)
     return(vals[2]) # Kmuscle
 }

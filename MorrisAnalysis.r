@@ -6,10 +6,9 @@ source('end_50daysim.r')
 source('setparams.r')
 
 # Get ranges for parameters
-# get testpars, parsbinf, parsbsup
-# TODO: make set_morris.r
-# p <- set_params()
-#source('set_morris.r')
+# get testpars, parsinf, parssup
+p <- set_params()
+source('set_morris.r')
 
 set.seed(56)
 
@@ -19,11 +18,6 @@ rval = 5 #100
 start_all <- Sys.time()
 print(start_all)
 
-
-# TODO: based on RDocumentation looks like I could get
-#    the output of Morris to be both for Kmuscle and Kplas
-# https://www.rdocumentation.org/packages/sensitivity/versions/1.29.0/topics/morris
-
 # Plasma K+ concentration effects
 print('start Kplas Morris')
 x_Kplas <- morris(model = Kplas_50days,
@@ -32,8 +26,8 @@ x_Kplas <- morris(model = Kplas_50days,
                     design = list(type = 'oat',
                                     levels = 10, 
                                     grid.jump = 1),
-                    binf = parsbinf,
-                    bsup = parsbsup,
+                    binf = parsinf,
+                    bsup = parssup,
                     scale = TRUE)
 end_Kplas <- Sys.time()
 print(end_Kplas)
