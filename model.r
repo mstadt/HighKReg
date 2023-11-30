@@ -1,4 +1,4 @@
-model <- function(Time, State, Pars, opts){
+model_Kreg <- function(Time, State, Pars, opts){
     # This function runs the 
     # Time -- time 
     # State -- state variables (M_Kgut, M_Kplas, M_Kinter, M_Kmuscle)

@@ -8,7 +8,7 @@ fast_sim <- function(IC, tvals, last_meal, params) {
                         SS = 0)
     out <- as.data.frame(lsoda(y = IC,
                                 times = tvals,
-                                func = model,
+                                func = model_Kreg,
                                 parms = params,
                                 opts = opts_fast,
                                 rtol = 1e-8,
@@ -26,7 +26,7 @@ meal_sim <- function(IC, t0, len_meal, Kamt, params){
                         SS = 0)
     out <- as.data.frame(lsoda(y = IC,
                                     times = tvals,
-                                    func = model,
+                                    func = model_Kreg,
                                     parms = params,
                                     opts = opts_meal,
                                     rtol = 1e-8,
@@ -41,44 +41,44 @@ day_sim <- function(IC0, len_meal, MealTimes, Kamt, params) {
     out_fast0 <- fast_sim(IC0, tvals, last_meal, params)
 
     # Meal 1
-    end <- out_fast0 
-    IC <- unlist(end[varnames])
+    # end <- out_fast0 
+    IC <- unlist(out_fast0[varnames])
     t0 <- MealTimes[1] #unlist(end['time'])
 
     out_meal1 <- meal_sim(IC, t0, len_meal, Kamt, params)
 
     # Fasting after Meal 1
-    end <- out_meal1
-    IC <- unlist(end[varnames])
-    t0 <- unlist(end['time'])
+    #end <- out_meal1
+    IC <- unlist(out_meal1[varnames])
+    t0 <- unlist(out_meal1['time'])
     tvals <- c(t0, MealTimes[2]) 
 
     out_fast1 <- fast_sim(IC, tvals, MealTimes[1], params)
 
     # Meal 2
-    end <- out_fast1 
-    IC <- unlist(end[varnames])
+    #end <- out_fast1 
+    IC <- unlist(out_fast1[varnames])
     t0 <- MealTimes[2]
     out_meal2 <- meal_sim(IC, t0, len_meal, Kamt, params)
 
     # Fasting after meal 2
-    end <- out_meal2 
-    IC <- unlist(end[varnames])
-    t0 <- unlist(end['time'])
+    #end <- out_meal2 
+    IC <- unlist(out_meal2[varnames])
+    t0 <- unlist(out_meal2['time'])
     tvals <- c(t0, MealTimes[3]) 
     out_fast2 <- fast_sim(IC, tvals, MealTimes[2], params)
 
     # Meal 3
-    end <- out_fast2
-    IC <- unlist(end[varnames])
+    #end <- out_fast2
+    IC <- unlist(out_fast2[varnames])
     t0 = MealTimes[3]
     out_meal3 <- meal_sim(IC,t0,len_meal,Kamt,params)
 
     # Fasting to end of day
     t_day_end <- 24 * 60.0 # end of day
-    end <- out_meal3 
-    IC <- unlist(end[varnames])
-    t0 <- unlist(end['time'])
+    #end <- out_meal3 
+    IC <- unlist(out_meal3[varnames])
+    t0 <- unlist(out_meal3['time'])
     tvals <- c(t0, t_day_end) 
     out_fast3 <- fast_sim(IC,tvals,t_day_end,params)
 return(out_fast3)
@@ -92,13 +92,12 @@ end_50daysim <- function(IC0, len_meal, MealTimes, Kamt, params) {
         #     print(sprintf("Day: %i", ii))
         # }
         day_ii_end <- day_sim(IC, len_meal, MealTimes, Kamt, params)
-        IC <- unlist(end[varnames])
+        IC <- unlist(day_ii_end[varnames])
     }
 
     # solve for K_plas, K_muscle
-    end <- day_ii_end
-    end_Kplas <- end$M_Kplas / params$V_plasma
-    end_Kmusc <- end$M_Kmuscle / params$V_muscle
+    end_Kplas <- day_ii_end$M_Kplas / params$V_plasma
+    end_Kmusc <- day_ii_end$M_Kmuscle / params$V_muscle
 
     return(c(end_Kplas, end_Kmusc))
 }
@@ -117,4 +116,14 @@ main_sim <- function(params){
     vals <- end_50daysim(IC0, 30, MealTimes, Kamt, params)
 
     return(vals)
+}
+
+Kplas_50days(pars) {
+    vals <- main_sim(pars)
+    return(vals[1]) # Kplas
+}
+
+Kmusc_50days(pars) {
+    vals <- main_sim(pars)
+    return(vals[2]) # Kmuscle
 }
