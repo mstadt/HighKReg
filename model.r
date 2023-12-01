@@ -10,6 +10,17 @@ model_Kreg <- function(Time, State, Pars, opts){
 
     with(as.list(c(State, Pars)), {
         # set parameters that are fixed (not in Morris Analysis)
+        V_plasma = 4.5
+        V_interstitial = 10
+        V_muscle = 24
+        P_ECF = 0.3
+        Vmax = 130
+        Km = 1.4
+        cdKsec_eq = 0.0022
+        A_cdKsec = 0.161275
+        B_cdKsec = 0.410711
+        k = 1.069
+        x0 = 0.5381
         Phi_Kin_ss = 0.04861111
         t_insulin_ss = 270
         fecal_excretion = 0.1

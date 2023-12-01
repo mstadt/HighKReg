@@ -15,7 +15,7 @@ source('set_morris.r')
 set.seed(56)
 
 # TO DO: change to 1000
-rval = 1000 #5 #100
+rval = 5 #1000 #5 #100
 
 start_all <- Sys.time()
 print(start_all)
@@ -26,7 +26,7 @@ x_Kplas <- morris(model = Kplas_50days_MA,
                     factors = testpars,
                     r = rval,
                     design = list(type = 'oat',
-                                    levels = 10, 
+                                    levels = 6, 
                                     grid.jump = 1),
                     binf = parsinf,
                     bsup = parssup,
@@ -43,7 +43,7 @@ print(difftime(end_Kplas, start_all, units = "mins"))
 #                         factors = testpars,
 #                         r = rval,
 #                         design = list(type = 'oat',
-#                                         levels = 10, 
+#                                         levels = 6, 
 #                                         grid.jump = 1),
 #                         binf = parsbinf,
 #                         bsup = parsbsup,
