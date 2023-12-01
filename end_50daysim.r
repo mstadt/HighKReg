@@ -95,11 +95,10 @@ end_50daysim <- function(IC0, len_meal, MealTimes, Kamt, params) {
         IC <- unlist(day_ii_end[varnames])
     }
 
-    # solve for K_plas, K_muscle
-    end_Kplas <- day_ii_end$M_Kplas / params$V_plasma
-    end_Kmusc <- day_ii_end$M_Kmuscle / params$V_muscle
+    end_MKplas <- day_ii_end$M_Kplas
+    end_MKmusc <- day_ii_end$M_Kmuscle
 
-    return(c(end_Kplas, end_Kmusc))
+    return(c(end_MKplas, end_MKmusc))
 }
 
 main_sim <- function(params){
@@ -118,12 +117,35 @@ main_sim <- function(params){
     return(vals)
 }
 
-Kplas_50days <- function(pars) {
-    vals <- main_sim(pars)
-    return(vals[1]) # Kplas
+main_sim_conc <- function(params){
+    vals <- main_sim(params)
+    end_Kplas <- vals[1]/params['V_plasma']
+    end_Kmusc <- vals[2]/params['V_muscle']
+    return(c(end_Kplas, end_Kmusc))
 }
 
-Kmusc_50days <- function(pars) {
-    vals <- main_sim(pars)
-    return(vals[2]) # Kmuscle
+Kplas_50days_MA <- function(X) {
+    #print(class(X))
+    #print(X)
+    #print(X[1,])
+    #temp <- X[1, ]
+    #print(temp['kgut'])
+    one_par <- function(i){
+        pars <- X[i, ]
+        vals <- main_sim(pars)
+        end_Kplas <- vals[1] / pars['V_plasma']
+        return(end_Kplas) # Kplas
+    }
+    res_Kplas <- sapply(1:nrow(X), one_par, simplify = TRUE)
+    return(res_Kplas)
 }
+
+# Kplas_50days <- function(pars) {
+#     vals <- main_sim(pars)
+#     return(vals[1]) # Kplas
+# }
+
+# Kmusc_50days <- function(pars) {
+#     vals <- main_sim(pars)
+#     return(vals[2]) # Kmuscle
+# }

@@ -1,10 +1,12 @@
 # libraries and source scripts
 library(deSolve)
 library(sensitivity)
+source('varnames.r')
 source('model.r')
 source('end_50daysim.r')
 source('setparams.r')
 
+varnames <- get_varnames()
 # Get ranges for parameters
 # get testpars, parsinf, parssup
 p <- set_params()
@@ -13,14 +15,14 @@ source('set_morris.r')
 set.seed(56)
 
 # TO DO: change to 1000
-rval = 5 #100
+rval = 1000 #5 #100
 
 start_all <- Sys.time()
 print(start_all)
 
 # Plasma K+ concentration effects
 print('start Kplas Morris')
-x_Kplas <- morris(model = Kplas_50days,
+x_Kplas <- morris(model = Kplas_50days_MA,
                     factors = testpars,
                     r = rval,
                     design = list(type = 'oat',
@@ -59,7 +61,7 @@ print(difftime(Sys.time(), start_all, units = "mins"))
 save_info = 1
 if (save_info) {
     today <- Sys.Date()
-    fname = past(today,
+    fname = paste(today,
                     "_MorrisAnalysis_50days",
                     ".RData",
                     sep = "")

@@ -18,14 +18,7 @@ Kamt <- 4*Kamt_control
 
 MealTimes <- array(c(6,12,18)) * 60.0
 
-# variable names
-get_varnames <- function() {
-    c("M_Kgut",
-    "M_Kplas",
-    "M_Kinter",
-    "M_Kmuscle")
-}
-varnames <- get_varnames()
+
 
 # set IC
 IC <- c(M_Kgut = 4.375,
