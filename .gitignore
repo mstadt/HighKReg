@@ -2,3 +2,4 @@
 *.png
 nohup.out
 *.RData
+runMA.sh
