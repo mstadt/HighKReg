@@ -14,8 +14,7 @@ source('set_morris.r')
 
 set.seed(56)
 
-# TO DO: change to 1000
-rval = 1000 #5 #1000 #5 #100
+rval = 10 #100 #1000 #5 #1000 #5 #100
 
 start_all <- Sys.time()
 print(start_all)
@@ -37,21 +36,20 @@ print('end Kplas Morris')
 print(difftime(end_Kplas, start_all, units = "mins"))
 
 
-# # Muscle K+ concentration effects
-# print('start Kmusc Morris')
-# x_Kmuscle <- morris(model = Kmusc_50days,
-#                         factors = testpars,
-#                         r = rval,
-#                         design = list(type = 'oat',
-#                                         levels = 6, 
-#                                         grid.jump = 1),
-#                         binf = parsbinf,
-#                         bsup = parsbsup,
-#                         x = x_Kplas$X, # use X from previous function
-#                         scale = TRUE)
-# print(Sys.time())
-# print('end Kmusc Morris')
-# print(difftime(Sys.time(), end_Kplas, units = "mins"))
+# Muscle K+ concentration effects
+print('start Kmusc Morris')
+x_Kmuscle <- morris(model = Kmusc_50days_MA,
+                        factors = testpars,
+                        r = rval,
+                        design = list(type = 'oat',
+                                        levels = 6, 
+                                        grid.jump = 1),
+                        binf = parsinf,
+                        bsup = parssup,
+                        scale = TRUE)
+print(Sys.time())
+print('end Kmusc Morris')
+print(difftime(Sys.time(), end_Kplas, units = "mins"))
 
 
 # Analysis complete
