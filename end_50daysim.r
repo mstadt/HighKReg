@@ -133,11 +133,25 @@ Kplas_50days_MA <- function(X) {
     one_par <- function(i){
         pars <- X[i, ]
         vals <- main_sim(pars)
-        end_Kplas <- vals[1] / pars['V_plasma']
+        Vplas <- 4.5 # fixed because not in pars
+        end_Kplas <- vals[1] / Vplas
+        #end_Kplas <- vals[1] / pars['V_plasma']
         return(end_Kplas) # Kplas
     }
     res_Kplas <- sapply(1:nrow(X), one_par, simplify = TRUE)
     return(res_Kplas)
+}
+
+Kmusc_50days_MA <- function(X) {
+    one_par <- function(i){
+        pars <- X[i, ]
+        vals <- main_sim(pars)
+        Vmusc <- 24 # fixed because not in pars
+        end_Kmusc <- vals[2] / Vmusc
+        return(end_Kmusc) # Kmusc
+    }
+    res_Kmusc <- sapply(1:nrow(X), one_par, simplify = TRUE)
+    return(res_Kmusc)
 }
 
 # Kplas_50days <- function(pars) {

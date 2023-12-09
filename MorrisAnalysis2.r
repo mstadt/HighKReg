@@ -14,8 +14,7 @@ source('set_morris.r')
 
 set.seed(56)
 
-# TO DO: change to 1000
-rval = 1000 #5 #1000 #5 #100
+rval = 100 #1000 #5 #1000 #5 #100
 
 start_all <- Sys.time()
 print(start_all)
@@ -58,15 +57,15 @@ print(difftime(end_Kplas, start_all, units = "mins"))
 print('Morris analysis complete')
 print(difftime(Sys.time(), start_all, units = "mins"))
 
-save_info = 1
-if (save_info) {
-    today <- Sys.Date()
-    fname = paste(today,
-                    "_MorrisAnalysis_50days",
-                    "_r-", rval,
-                    ".RData",
-                    sep = "")
-    save.image(fname)
-    print("results saved to:")
-    print(sprintf("%s", fname))
-}
+
+
+today <- Sys.Date()
+fname = paste(today,
+                "_MorrisAnalysis2_50days",
+                "_r-", rval,
+                ".RData",
+                sep = "")
+save.image(fname)
+print("results saved to:")
+print(sprintf("%s", fname))
+

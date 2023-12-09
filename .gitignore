@@ -2,3 +2,5 @@
 *.png
 nohup.out
 *.RData
+*.sh
+*.log
